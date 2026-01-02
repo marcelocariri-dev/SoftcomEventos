@@ -174,23 +174,5 @@ class IngressoApiController extends Controller
         }
     }
 
-    /**
-     * GET /api/ingressos/estatisticas
-     */
-    public function estatisticas()
-    {
-        try {
-            $stats = $this->repository->estatisticas();
-
-            return response()->json([
-                'data' => $stats
-            ], 200);
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erro ao buscar estatísticas',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+   
 }

@@ -22,10 +22,15 @@ class Inscricao extends Model
         'valor_pago' => 'decimal:2'
     ];
 
-    // ==========================================
-    // RELACIONAMENTOS
-    // ==========================================
-
+    public function getImagemUrlAttribute()
+    {
+        if ($this->imagem) {
+            return asset('storage/' . $this->imagem);
+        }
+        
+        // Imagem padrão (coloque uma em public/images/default-evento.jpg)
+        return asset('eventos/default.png');
+    }
     public function evento()
     {
         return $this->belongsTo(Evento::class, 'evento_id');

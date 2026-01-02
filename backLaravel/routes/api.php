@@ -98,7 +98,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/', 'Api\EventoApiController@index');
         Route::get('/proximos', 'Api\EventoApiController@proximos');
         Route::get('/disponiveis', 'Api\EventoApiController@disponiveis');
-        Route::get('/estatisticas', 'Api\EventoApiController@estatisticas');
+       // Route::get('/estatisticas', 'Api\EventoApiController@estatisticas');
+        
         Route::get('/{id}', 'Api\EventoApiController@show');
     });
 
@@ -113,8 +114,7 @@ Route::prefix('v1')->group(function () {
     // PARTICIPANTES
     Route::prefix('participantes')->group(function () {
         Route::get('/', 'Api\ParticipanteApiController@index');
-        Route::get('/cpf/{cpf}', 'Api\ParticipanteApiController@buscarPorCpf');
-        Route::get('/{id}', 'Api\ParticipanteApiController@show');
+      Route::get('/{id}', 'Api\ParticipanteApiController@show');
     });
 
     // INGRESSOS
@@ -140,18 +140,19 @@ Route::prefix('v1')->group(function () {
 });
 
 /*
-|--------------------------------------------------------------------------
-| ROTAS PROTEGIDAS (com autenticação Sanctum)
-|--------------------------------------------------------------------------
+
+ROTAS PROTEGIDAS (com autenticação Sanctum)
+
 */
 
 Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
-
+    Route::get('/meus', 'Api\EventoApiController@meusEventos');
     // EVENTOS - CRUD
     Route::prefix('eventos')->group(function () {
         Route::post('/', 'Api\EventoApiController@store');
         Route::put('/{id}', 'Api\EventoApiController@update');
         Route::delete('/{id}', 'Api\EventoApiController@destroy');
+      
     });
 
     // LOCAIS - CRUD
@@ -177,8 +178,9 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::get('/estatisticas', 'Api\IngressoApiController@estatisticas');
     });
      // inscricoes - CRUD e perfil (autenticado)
-    
+     Route::get('/minhas', 'Api\InscricaoApiController@minhas');
     Route::prefix('inscricoes')->group(function () {
+        
         Route::post('/', 'Api\InscricaoApiController@store');
         Route::put('/{id}', 'Api\InscricaoApiController@update');
         Route::delete('/{id}', 'Api\InscricaoApiController@destroy');
@@ -186,9 +188,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         // Ações especiais
         Route::put('/{id}/confirmar', 'Api\InscricaoApiController@confirmar');
         Route::put('/{id}/cancelar', 'Api\InscricaoApiController@cancelar');
-        
-        // Minhas inscrições
-        Route::get('/minhas', 'Api\InscricaoApiController@minhas');
+       
     });
 
 

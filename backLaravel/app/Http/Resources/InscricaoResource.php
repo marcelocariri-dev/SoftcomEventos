@@ -30,9 +30,7 @@ class InscricaoResource extends JsonResource
             
           
             
-            // ==========================================
-            // RELACIONAMENTO: EVENTO
-            // ==========================================
+          
             'evento' => $this->when($this->relationLoaded('evento') && $this->evento, function () {
                 return [
                     'id' => $this->evento->id,
@@ -44,7 +42,7 @@ class InscricaoResource extends JsonResource
                     'data_fim_formatada' => $this->evento->data_fim->format('d/m/Y H:i'),
                     'status' => $this->evento->status,
                     'imagem' => $this->evento->imagem,
-                    
+                   'imagem_url' => $this->imagem_url,
                     // Local do evento (se carregado)
                     'local' => $this->when(
                         $this->evento->relationLoaded('local') && $this->evento->local,
@@ -61,9 +59,7 @@ class InscricaoResource extends JsonResource
                 ];
             }),
             
-            // ==========================================
-            // RELACIONAMENTO: PARTICIPANTE
-            // ==========================================
+          
             'participante' => $this->when($this->relationLoaded('participante') && $this->participante, function () {
                 return [
                     'id' => $this->participante->id,
@@ -76,14 +72,12 @@ class InscricaoResource extends JsonResource
                 ];
             }),
             
-            // ==========================================
-            // RELACIONAMENTO: INGRESSO
-            // ==========================================
+      
             'ingresso' => $this->when($this->relationLoaded('ingresso') && $this->ingresso, function () {
                 return [
                     'id' => $this->ingresso->id,
                     'tipo_ingresso' => $this->ingresso->tipo_ingresso,
-                    'tipo_ingresso_formatado' => $this->formatarTipoIngresso($this->ingresso->tipo_ingresso),
+                  
                     'valor' => $this->ingresso->valor,
                     'valor_formatado' => 'R$ ' . number_format($this->ingresso->valor, 2, ',', '.'),
                     'descricao' => $this->ingresso->descricao,
@@ -92,50 +86,7 @@ class InscricaoResource extends JsonResource
         ];
     }
 
-    /**
-     * Formatar CPF
-     */
-    private function formatarCpf($cpf)
-    {
-        if (strlen($cpf) !== 11) {
-            return $cpf;
-        }
-        
-        return substr($cpf, 0, 3) . '.' . 
-               substr($cpf, 3, 3) . '.' . 
-               substr($cpf, 6, 3) . '-' . 
-               substr($cpf, 9, 2);
-    }
-
-    /**
-     * Formatar Telefone
-     */
-    private function formatarTelefone($telefone)
-    {
-        if (strlen($telefone) !== 11) {
-            return $telefone;
-        }
-        
-        return '(' . substr($telefone, 0, 2) . ') ' . 
-               substr($telefone, 2, 5) . '-' . 
-               substr($telefone, 7, 4);
-    }
-
-    /**
-     * Formatar Tipo de Ingresso
-     */
-    private function formatarTipoIngresso($tipo)
-    {
-        $tipos = [
-            'inteira' => 'Inteira',
-            'meia' => 'Meia-Entrada',
-            'vip' => 'VIP',
-            'cortesia' => 'Cortesia',
-        ];
-
-        return $tipos[$tipo] ?? ucfirst($tipo);
-    }
-
+    
     /**
      * Get additional data that should be returned with the resource array.
      */

@@ -27,7 +27,7 @@ public function toArray($request)
         'vagas_disponiveis' => $this->vagas_disponiveis,
         'esta_lotado' => $this->esta_lotado,
         'duracao_em_dias' => $this->duracao_em_dias,
-
+'imagem_url' => $this->imagem_url,
         //relacionamentos
 
         'local' => new LocalResource($this->whenloaded('local')),

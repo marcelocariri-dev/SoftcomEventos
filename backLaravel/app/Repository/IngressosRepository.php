@@ -15,9 +15,6 @@ class IngressosRepository
         $this->model = new Ingresso();
     }
 
-    // ==========================================
-    // CRUD BÁSICO
-    // ==========================================
 
     public function listagem()
     {
@@ -71,10 +68,7 @@ class IngressosRepository
         return true;
     }
 
-    // ==========================================
-    // MÉTODOS COM FILTROS
-    // ==========================================
-
+  
     public function listagemComFiltros(IngressoFilter $filters)
     {
         return $this->model
@@ -94,7 +88,6 @@ class IngressosRepository
     }
 
 
-    // MÉTODOS ESPECÍFICOS
    
 
     public function buscarPorEvento($eventoId)
@@ -116,24 +109,10 @@ class IngressosRepository
             ->get();
     }
 
-    public function buscarPorTipo(string $tipoIngresso)
-    {
-        return $this->model
-            ->PorTipo($tipoIngresso)
-            ->with(['evento'])
-            ->orderBy('valor', 'asc')
-            ->get();
-    }
+  
 
  
-    public function ingressosEsgotados()
-    {
-        return $this->model
-            ->esgotados()
-            ->with(['evento'])
-            ->orderBy('evento_id', 'desc')
-            ->get();
-    }
+  
 
     public function alterarStatus($id, bool $status)
     {
@@ -149,16 +128,16 @@ class IngressosRepository
         return $this->capturar($ingresso->id);
     }
 
-    public function estatisticas()
-    {
-        return [
-            'total' => $this->model->count(),
-            'ativos' => $this->model->where('ativo', true)->count(),
-            'inativos' => $this->model->where('ativo', false)->count(),
-            'disponiveis' => $this->model->where('quantidade_disponivel', '>', 0)->count(),
-            'esgotados' => $this->model->where('quantidade_disponivel', '<=', 0)->count(),
-            'gratuitos' => $this->model->where('valor', 0)->count(),
-            'pagos' => $this->model->where('valor', '>', 0)->count(),
-        ];
-    }
+    //public function estatisticas()
+    //{
+       // return [
+         //   'total' => $this->model->count(),
+         ////   'ativos' => $this->model->where('ativo', true)->count(),
+           // 'inativos' => $this->model->where('ativo', false)->count(),
+          //  'disponiveis' => $this->model->where('quantidade_disponivel', '>', 0)->count(),
+           // 'esgotados' => $this->model->where('quantidade_disponivel', '<=', 0)->count(),
+           // 'gratuitos' => $this->model->where('valor', 0)->count(),
+           // 'pagos' => $this->model->where('valor', '>', 0)->count(),
+       // ];
+   // }
 }

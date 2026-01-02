@@ -180,30 +180,12 @@ class Participante extends Model
         return optional($this->user)->name;
     }
 
-    // ==========================================
-    // MUTATORS
-    // ==========================================
-
-    /**
-     * Remove formatação do CPF
-     */
-    public function setCpfAttribute($value)
-    {
-        $this->attributes['cpf'] = preg_replace('/[^0-9]/', '', $value);
-    }
-
-    /**
-     * Remove formatação do telefone
-     */
+   
     public function setTelefoneAttribute($value)
     {
         $this->attributes['telefone'] = preg_replace('/[^0-9]/', '', $value);
     }
 
-    
-    // ==========================================
-    // MÉTODOS AUXILIARES
-    // ==========================================
 
     /**
      * Verifica se tem inscrição em um evento
@@ -249,45 +231,8 @@ class Participante extends Model
                     ->first();
     }
 
-    /**
-     * Validar CPF
-     */
-    public static function validarCpf($cpf)
-    {
-        $cpf = preg_replace('/[^0-9]/', '', $cpf);
-
-        if (strlen($cpf) != 11) {
-            return false;
-        }
-
-        if (preg_match('/(\d)\1{10}/', $cpf)) {
-            return false;
-        }
-
-        for ($t = 9; $t < 11; $t++) {
-            for ($d = 0, $c = 0; $c < $t; $c++) {
-                $d += $cpf[$c] * (($t + 1) - $c);
-            }
-            $d = ((10 * $d) % 11) % 10;
-            if ($cpf[$c] != $d) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * É maior de idade
-     */
-    public function eMaiorDeIdade()
-    {
-        return $this->idade >= 18;
-    }
-
-    /**
-     * Pode se inscrever no evento
-     */
+   
+   
     public function podeSeInscreverNoEvento($eventoId)
     {
         return $this->ativo && !$this->temInscricaoEmEvento($eventoId);

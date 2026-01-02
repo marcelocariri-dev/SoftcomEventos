@@ -35,7 +35,7 @@ public function toArray($request)
             // Relacionamentos (quando necessário)
             'eventos' => EventoResource::collection($this->whenLoaded('eventos')),
       
-    // PRo Timestamps
+  
                 'criado_em' => $this->created_at->format('Y-m-d H:i:s'),
                 'atualizado_em' => $this->updated_at->format('Y-m-d H:i:s'),
 

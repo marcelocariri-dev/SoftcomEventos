@@ -7,15 +7,20 @@ use App\Http\Requests\InscricaoRequest;
 use App\Http\Resources\InscricaoResource;
 use App\Repository\InscricoesRepository;
 use App\Filters\InscricaoFilter;
+use App\Repository\ParticipantesRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
 
 class InscricaoApiController extends Controller
 {
     private $repository;
+    private $repoP;
 
-    public function __construct(InscricoesRepository $repository)
+    public function __construct(InscricoesRepository $repository, ParticipantesRepository $repoP)
     {
         $this->repository = $repository;
+        $this->repoP = $repoP;
     }
 
     /**
@@ -272,21 +277,40 @@ class InscricaoApiController extends Controller
      * GET /api/v1/inscricoes/minhas
      * Minhas inscrições (usuário autenticado)
      */
-    public function minhas(Request $request)
+    public function minhas()
     {
         try {
-            $user = $request->user();
-            
-            if (!$user->temParticipante()) {
+            $user_Id = auth()->id();
+            /// aqui ele pegou a id do participante e jogou para buscar as inscrições 
+            //desse participante
+            Log::info('=== INÍCIO DEBUG MINHAS INSCRIÇÕES ===');
+        Log::info('User ID: ' . $user_Id);
+
+            $participantes_ids = $this->repoP->ParticipantePorUser($user_Id);
+           
+            Log::info('IDs de participantes encontrados:', ['ids' => $participantes_ids]);
+           
+
+            if (!$participantes_ids) {
+                Log::warning('Usuário não tem participante cadastrado');
                 return response()->json([
                     'message' => 'Você ainda não possui dados de participante cadastrados',
                     'data' => []
                 ], 200);
             }
+            $inscricoes = $this->repository->buscarPorParticipanteID($participantes_ids);
 
-            $inscricoes = $this->repository->buscarPorParticipante($user->participante->id);
 
-            return InscricaoResource::collection($inscricoes);
+
+           return InscricaoResource::collection($inscricoes);
+
+           //return response()->json([
+           // 'debug' => true,
+           // 'user_id' => $user_Id,
+          //  'participantes_ids' => $participantes_ids,
+            //'total_inscricoes' => $inscricoes->count(),
+          //  'inscricoes' => $inscricoes->toArray(), // ← dados brutos
+       // ]); TESTANDO
             
         } catch (\Exception $e) {
             return response()->json([
@@ -296,50 +320,5 @@ class InscricaoApiController extends Controller
         }
     }
 
-    /**
-     * GET /api/v1/inscricoes/estatisticas
-     * Estatísticas gerais de inscrições
-     */
-    public function estatisticas()
-    {
-        try {
-            $stats = $this->repository->estatisticas();
-
-            return response()->json([
-                'data' => $stats
-            ], 200);
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erro ao buscar estatísticas',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * GET /api/v1/inscricoes/evento/{evento_id}/estatisticas
-     * Estatísticas de inscrições de um evento específico
-     */
-    public function estatisticasPorEvento($evento_id)
-    {
-        try {
-            $stats = [
-                'total' => $this->repository->contarInscritosPorEvento($evento_id),
-                'confirmadas' => $this->repository->contarInscritosPorEvento($evento_id, 'confirmado'),
-                'pendentes' => $this->repository->contarInscritosPorEvento($evento_id, 'pendente'),
-                'canceladas' => $this->repository->contarInscritosPorEvento($evento_id, 'cancelado'),
-            ];
-
-            return response()->json([
-                'data' => $stats
-            ], 200);
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erro ao buscar estatísticas',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+   
 }

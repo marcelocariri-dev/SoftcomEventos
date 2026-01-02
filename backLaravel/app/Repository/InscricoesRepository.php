@@ -106,10 +106,7 @@ class InscricoesRepository
             $participante = Participante::create([
                 'user_id' => $userId,
                 'nome' => $dadosParticipante['nome'],
-                'cpf' => $dadosParticipante['cpf'],
-                'email' => $dadosParticipante['email'],
-                'telefone' => $dadosParticipante['telefone'],
-                'data_nascimento' => $dadosParticipante['data_nascimento'],
+                
                 'ativo' => true,
             ]);
         }
@@ -156,10 +153,7 @@ class InscricoesRepository
         return true;
     }
 
-    // ==========================================
-    // FILTROS E LISTAGENS
-    // ==========================================
-
+   
     public function listagemComFiltros(InscricaoFilter $filters)
     {
         return $this->model
@@ -188,9 +182,7 @@ class InscricoesRepository
             ->get();
     }
 
-    /**
-     * Buscar inscrições por participante
-     */
+    
     public function buscarPorParticipante(int $participanteId)
     {
         return $this->model
@@ -200,9 +192,24 @@ class InscricoesRepository
             ->get();
     }
 
-    /**
-     * Buscar inscrições por ingresso
-     */
+
+    
+    public function buscarPorParticipanteID(Array $participantesIds)
+
+    { 
+
+        if (empty($participantesIds)) {
+            return collect([]); // ou $this->model->newCollection();
+        }
+        return $this->model
+            ->wherein('participante_id', $participantesIds) //busca todos os ids do array
+            ->with(['evento.local', 'ingresso'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+
+    
     public function buscarPorIngresso(int $ingressoId)
     {
         return $this->model
@@ -212,13 +219,7 @@ class InscricoesRepository
             ->get();
     }
 
-    // ==========================================
-    // MÉTODOS POR STATUS
-    // ==========================================
-
-    /**
-     * Inscrições confirmadas de um evento
-     */
+  
     public function confirmadasPorEvento(int $eventoId)
     {
         return $this->model
@@ -229,35 +230,7 @@ class InscricoesRepository
             ->get();
     }
 
-    /**
-     * Inscrições pendentes de um evento
-     */
-    public function pendentesPorEvento(int $eventoId)
-    {
-        return $this->model
-            ->where('evento_id', $eventoId)
-            ->pendentes()
-            ->with(['participante'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-    }
-
-    /**
-     * Inscrições canceladas de um evento
-     */
-    public function canceladasPorEvento(int $eventoId)
-    {
-        return $this->model
-            ->where('evento_id', $eventoId)
-            ->canceladas()
-            ->with(['participante'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-    }
-
-    /**
-     * Todas as inscrições pendentes (geral)
-     */
+   
     public function todasPendentes()
     {
         return $this->model
@@ -267,9 +240,6 @@ class InscricoesRepository
             ->get();
     }
 
-    /**
-     * Todas as inscrições confirmadas (geral)
-     */
     public function todasConfirmadas()
     {
         return $this->model
@@ -279,13 +249,7 @@ class InscricoesRepository
             ->get();
     }
 
-    // ==========================================
-    // AÇÕES DE ALTERAÇÃO DE STATUS
-    // ==========================================
-
-    /**
-     * Confirmar inscrição
-     */
+  
     public function confirmar(int $id)
     {
         $inscricao = $this->capturar($id);
@@ -307,9 +271,6 @@ class InscricoesRepository
         return $this->capturar($inscricao->id);
     }
 
-    /**
-     * Cancelar inscrição
-     */
     public function cancelar(int $id)
     {
         $inscricao = $this->capturar($id);
@@ -331,37 +292,8 @@ class InscricoesRepository
         return $this->capturar($inscricao->id);
     }
 
-    /**
-     * Confirmar múltiplas inscrições de uma vez
-     */
-    public function confirmarEmLote(array $ids)
-    {
-        $confirmadas = [];
-        $erros = [];
+    
 
-        foreach ($ids as $id) {
-            try {
-                $confirmadas[] = $this->confirmar($id);
-            } catch (\Exception $e) {
-                $erros[$id] = $e->getMessage();
-            }
-        }
-
-        return [
-            'confirmadas' => $confirmadas,
-            'erros' => $erros,
-            'total_confirmadas' => count($confirmadas),
-            'total_erros' => count($erros),
-        ];
-    }
-
-    // ==========================================
-    // VERIFICAÇÕES E VALIDAÇÕES
-    // ==========================================
-
-    /**
-     * Verificar se participante já está inscrito em evento
-     */
     public function participanteEstaInscrito(int $eventoId, int $participanteId)
     {
         return $this->model
@@ -371,89 +303,7 @@ class InscricoesRepository
             ->exists();
     }
 
-    /**
-     * Verificar se evento está lotado
-     */
-    public function eventoEstaLotado(int $eventoId)
-    {
-        $evento = \App\Models\Evento::find($eventoId);
-        
-        if (!$evento) {
-            throw new \Exception("Evento não encontrado");
-        }
-
-        $inscritosAtivos = $this->contarInscritosPorEvento($eventoId);
-
-        return $inscritosAtivos >= $evento->capacidade_maxima;
-    }
-
-    // ==========================================
-    // CONTAGENS E ESTATÍSTICAS
-    // ==========================================
-
-    /**
-     * Contar inscritos por evento
-     */
-    public function contarInscritosPorEvento(int $eventoId, string $status = null)
-    {
-        $query = $this->model->where('evento_id', $eventoId);
-
-        if ($status) {
-            $query->where('status', $status);
-        } else {
-            $query->ativas();
-        }
-
-        return $query->count();
-    }
-
-    /**
-     * Contar inscrições por participante
-     */
-    public function contarInscricoesPorParticipante(int $participanteId, string $status = null)
-    {
-        $query = $this->model->where('participante_id', $participanteId);
-
-        if ($status) {
-            $query->where('status', $status);
-        }
-
-        return $query->count();
-    }
-
-    /**
-     * Estatísticas gerais de inscrições
-     */
-    public function estatisticas()
-    {
-        return [
-            'total' => $this->model->count(),
-            'pendentes' => $this->model->pendentes()->count(),
-            'confirmadas' => $this->model->confirmadas()->count(),
-            'canceladas' => $this->model->canceladas()->count(),
-            'ativas' => $this->model->ativas()->count(),
-            'valor_total_arrecadado' => number_format($this->model->confirmadas()->sum('valor_pago'), 2, '.', ''),
-            'valor_pendente' => number_format($this->model->pendentes()->sum('valor_pago'), 2, '.', ''),
-            'ticket_medio' => number_format($this->model->confirmadas()->avg('valor_pago'), 2, '.', ''),
-        ];
-    }
-
-    /**
-     * Estatísticas por período
-     */
-    public function estatisticasPorPeriodo(\DateTime $dataInicio, \DateTime $dataFim)
-    {
-        $query = $this->model
-            ->whereBetween('created_at', [$dataInicio, $dataFim]);
-
-        return [
-            'total' => $query->count(),
-            'confirmadas' => (clone $query)->confirmadas()->count(),
-            'pendentes' => (clone $query)->pendentes()->count(),
-            'canceladas' => (clone $query)->canceladas()->count(),
-            'valor_arrecadado' => number_format((clone $query)->confirmadas()->sum('valor_pago'), 2, '.', ''),
-        ];
-    }
+   
 
    
   

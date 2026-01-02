@@ -41,6 +41,16 @@ protected $table = "eventos";
     }
     
 
+
+public function getImagemUrlAttribute()
+{
+    if ($this->imagem) {
+        return asset('storage/' . $this->imagem);
+    }
+    
+    // Imagem padrão (coloque uma em public/images/default-evento.jpg)
+    return asset('eventos/default.png');
+}
     public function organizador()
     {
         return $this->belongsTo(User::class, 'user_id');

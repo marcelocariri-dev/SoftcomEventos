@@ -32,7 +32,7 @@ class EventoRequest extends FormRequest
             'local_id' => 'required|exists:locais,id',
             'capacidade_maxima' => 'required|integer|min:1',
             'valor_padrao' => 'nullable|numeric|min:0',
-            'imagem' => 'nullable|string|max:500',
+            'imagem' => 'nullable',
             'status' => 'required|in:rascunho,publicado,cancelado,finalizado',
             'user_id' => 'nullable|exists:users,id',
             'ativo' => 'boolean'

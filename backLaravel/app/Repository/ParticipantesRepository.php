@@ -92,19 +92,15 @@ class ParticipantesRepository
             ->paginate($perPage);
     }
 
-    // ==========================================
-    // MÉTODOS ESPECÍFICOS
-    // ==========================================
-
-    public function buscarPorCpf(string $cpf)
-    {
-        $cpf = preg_replace('/[^0-9]/', '', $cpf);
-        return $this->model
-            ->where('cpf', $cpf)
-            ->with(['user', 'inscricoes'])
-            ->first();
-    }
-
+ 
+public function ParticipantePorUser($user_ID){
+    return $this->model
+    ->where('user_id', $user_ID)
+    ->pluck('id') //pega todos e coloca no array
+    ->toArray();
+    //->value('id'); where so desse valor
+    // ->first(['id']);  // ------   retorna 1 registro ou null->model->id) // retorna o objeto;
+}
 
     public function participantesComInscricoes()
     {
@@ -137,16 +133,5 @@ class ParticipantesRepository
         return $this->capturar($participante->id);
     }
 
-    public function estatisticas()
-    {
-        return [
-            'total' => $this->model->count(),
-            'ativos' => $this->model->where('ativo', true)->count(),
-            'inativos' => $this->model->where('ativo', false)->count(),
-            'com_inscricoes' => $this->model->has('inscricoes')->count(),
-            'sem_inscricoes' => $this->model->doesntHave('inscricoes')->count(),
-            'com_usuario' => $this->model->whereNotNull('user_id')->count(),
-            'sem_usuario' => $this->model->whereNull('user_id')->count(),
-        ];
-    }
+    
 }

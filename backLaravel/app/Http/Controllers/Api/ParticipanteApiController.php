@@ -143,47 +143,7 @@ class ParticipanteApiController extends Controller
         }
     }
 
-    /**
-     * GET /api/participantes/cpf/{cpf}
-     */
-    public function buscarPorCpf($cpf)
-    {
-        try {
-            $participante = $this->repository->buscarPorCpf($cpf);
+  
 
-            if (!$participante) {
-                return response()->json([
-                    'message' => 'Participante não encontrado'
-                ], 404);
-            }
-
-            return new ParticipanteResource($participante);
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erro ao buscar participante',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * GET /api/participantes/estatisticas
-     */
-    public function estatisticas()
-    {
-        try {
-            $stats = $this->repository->estatisticas();
-
-            return response()->json([
-                'data' => $stats
-            ], 200);
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erro ao buscar estatísticas',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+   
 }

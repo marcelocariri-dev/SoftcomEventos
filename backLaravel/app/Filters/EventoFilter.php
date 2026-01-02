@@ -1,6 +1,6 @@
 <?php
 namespace App\Filters;
-
+use Illuminate\Support\Facades\Log;
 Class EventoFilter extends QueryFilter{
   
    public function titulo($value)
@@ -38,7 +38,25 @@ Class EventoFilter extends QueryFilter{
            $query->where('cidade', 'like', "%{$value}%");
        });
    }
+  
+   public function data_inicio($value)
+    { Log::info('🔥 Filtro data_inicio chamado!', ['value' => $value]);
+        return $this->builder->whereDate('data_inicio', '>=', $value);
+    }
+    public function datainicio($value)
+    { Log::info('🔥 Filtro data_inicio chamado!', ['value' => $value]);
+        return $this->builder->whereDate('data_inicio', '>=', $value);
+    }
 
+   
+    public function data_fim($value)
+    {
+        return $this->builder->whereDate('data_inicio', '<=', $value);
+    }
+    public function datafim($value)
+    {
+        return $this->builder->whereDate('data_inicio', '<=', $value);
+    }
    /**
     * Filtrar por estado do local
     *

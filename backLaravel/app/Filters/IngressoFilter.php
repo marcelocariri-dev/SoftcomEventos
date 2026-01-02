@@ -153,39 +153,9 @@ class IngressoFilter extends QueryFilter
     }
 
     /**
-     * Filtrar por percentual de vendas mínimo
-     */
-    public function percentualVendasMinimo($value)
-    {
-        if (is_numeric($value) && $value >= 0 && $value <= 100) {
-            $this->builder->whereRaw(
-                '((SELECT COUNT(*) FROM inscricoes WHERE ingresso_id = ingressos.id AND status = "confirmado") / quantidade_disponivel * 100) >= ?',
-                [$value]
-            );
-        }
-    }
+    
 
-    /**
-     * Filtrar ingressos com vendas
-     */
-    public function comVendas($value)
-    {
-        if ($value == '1' || $value === true) {
-            $this->builder->has('inscricoes');
-        }
-    }
-
-    /**
-     * Filtrar ingressos sem vendas
-     */
-    public function semVendas($value)
-    {
-        if ($value == '1' || $value === true) {
-            $this->builder->doesntHave('inscricoes');
-        }
-    }
-
-    /**
+   
      * Filtrar por quantidade vendida mínima
      */
     public function quantidadeVendidaMinima($value)

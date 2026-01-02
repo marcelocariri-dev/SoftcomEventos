@@ -84,11 +84,11 @@ try {
   $evento = $this->repository->salvar($dados);
 
   if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
-    
-    $this->repository->uploadImage($request->file('imagem'));
-    
-  
-    $evento->refresh(); 
+    $imagePath = $request->file('imagem')->store('eventos', 'public');
+            
+            // Atualizar o caminho da imagem no evento
+            $evento->imagem = $imagePath;
+            $evento->save();
 }
   return response()->json([
     'message' => 'Evento criado com sucesso',
@@ -189,6 +189,21 @@ public function destroy ($id){
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function meusEventos(){
+      try {
+        $userId = auth()->id();
+       
+$eventoOrg = $this->repository->buscarPorOrganizador($userId);
+        return EventoResource::collection($eventoOrg);
+        
+      }catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Erro ao listar eventos por organizador',
+            'error' => $e->getMessage()
+        ], 500);
+    }
     }
 
     /**

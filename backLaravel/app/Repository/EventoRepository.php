@@ -104,16 +104,14 @@ class EventoRepository
     public function listagemComFiltrosPaginado(EventoFilter $filters, int $perPage = 15)
     {
         return $this->model
+             ->proximos()
             ->with(['local', 'organizador', 'ingressos'])
             ->filter($filters)
-            ->orderBy('data_inicio', 'desc')
+            ->orderBy('data_inicio', 'asc')
             ->paginate($perPage);
     }
 
-    // ==========================================
-    // MÉTODOS ESPECÍFICOS
-    // ==========================================
-
+    
     /**
      * Buscar eventos por local
      */

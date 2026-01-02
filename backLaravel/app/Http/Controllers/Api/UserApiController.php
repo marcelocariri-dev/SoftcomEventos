@@ -110,14 +110,15 @@ class UserApiController extends Controller
 
             $dados = $request->validated();
 
-            // Atualizar senha apenas se foi enviada
-            if (!empty($dados['password'])) {
-                $dados['password'] = Hash::make($dados['password']);
+             //Atualizar senha apenas se foi enviada
+          if (!empty($dados['password'])) {
+               $dados['password'] = Hash::make($dados['password']);
             } else {
                 unset($dados['password']);
             }
 
-            $user->update($dados);
+            $user->fill($dados);
+            $user->save();
 
             return response()->json([
                 'message' => 'Usuário atualizado com sucesso',

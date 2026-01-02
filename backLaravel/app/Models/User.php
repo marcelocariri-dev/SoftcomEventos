@@ -30,25 +30,17 @@ class User extends Authenticatable
     // RELACIONAMENTOS
     // ==========================================
 
-    /**
-     * Eventos organizados por este usuário
-     */
     public function eventosOrganizados()
     {
         return $this->hasMany(Evento::class, 'user_id');
     }
 
-    /**
-     * Dados de participante (se for participante)
-     */
     public function participante()
     {
         return $this->hasOne(Participante::class, 'user_id');
     }
 
-    /**
-     * Inscrições em eventos (via participante)
-     */
+    
     public function inscricoes()
     {
         return $this->hasManyThrough(
@@ -80,10 +72,9 @@ class User extends Authenticatable
         return Participante::create([
             'user_id' => $this->id,
             'nome' => $dados['nome'] ?? $this->name,
-            'cpf' => $dados['cpf'],
             'email' => $dados['email'] ?? $this->email,
-            'telefone' => $dados['telefone'],
-            'data_nascimento' => $dados['data_nascimento'],
+          
+            
             'ativo' => true,
         ]);
     }
